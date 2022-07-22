@@ -1,3 +1,6 @@
+# Домашнее задание к лекции «Объекты и классы.
+# Инкапсуляция, наследование и полиморфизм»
+
 class Student:
     def __init__(self, name, surname, gender):
         self.name = name
@@ -8,9 +11,14 @@ class Student:
         self.grades = {}
 
     def add_courses(self, course_name):
+        """Добавляет курс в список курсов, находящихся в процессе изучения
+           студента."""
+
         self.courses_in_progress.append(course_name)
 
     def rate_lecturer(self, lecturer, course, grade):
+        """Реализует выставление оценки лектору за курс."""
+
         if (isinstance(lecturer, Lecturer)
             and course in lecturer.courses_attached
                 and course in self.courses_in_progress):
@@ -22,6 +30,11 @@ class Student:
             return 'Ошибка'
 
     def average_hw_grade(self):
+        """Реализует расчет средней оценки студента по всем домашним заданиям
+           по всем курсам.
+
+           Вычисленная оценка округляется до 1-го знака после запятой."""
+
         grades_quantity = 0
         grades_sum = 0
         for course in self.grades:
@@ -32,6 +45,9 @@ class Student:
         return ahwg
 
     def courses_in_prog(self):
+        """Реализует формирование строки с перечнем курсов, находящихся
+           в процессе изучения студентом."""
+
         cinp = ''
         for course in self.courses_in_progress:
             if cinp != '':
@@ -42,6 +58,9 @@ class Student:
         return(cinp)
 
     def finish_courses(self):
+        """Реализует формирование строки с перечнем завершенных студентом
+           курсов."""
+
         fc = ''
         for course in self.finished_courses:
             if fc != '':
@@ -59,6 +78,12 @@ class Student:
                 f'Курсы в процессе изучения: {self.courses_in_prog()} \n'
                 f'Завершенные курсы: {self.finish_courses()}')
 
+    def __eq__(self, other):
+        return (self.average_hw_grade() == other.average_hw_grade())
+
+    def __gt__(self, other):
+        return (self.average_hw_grade() > other.average_hw_grade())
+
 
 class Mentor:
     def __init__(self, name, surname):
@@ -67,6 +92,8 @@ class Mentor:
         self.courses_attached = []
 
     def add_courses(self, course_name):
+        """Добавляет курс в список курсов ментора"""
+
         self.courses_attached.append(course_name)
 
 
@@ -74,8 +101,14 @@ class Lecturer(Mentor):
     def __init__(self, name, surname):
         super().__init__(name, surname)
         self.grades = {}
+        self.average_grade = 0
 
     def average_lec_rating(self):
+        """Вычисляет среднюю оценку лектора по всем его курсам.
+
+           Метод суммирует все оценки лектора по всем его курсам
+           и вычисляет среднюю."""
+
         grades_quantity = 0
         grades_sum = 0
         for course in self.grades:
@@ -86,15 +119,23 @@ class Lecturer(Mentor):
         return alr
 
     def __str__(self):
-
         return (f'Имя: {self.name} \n'
                 f'Фамилия: {self.surname} \n'
                 f'Средняя оценка за лекции: {self.average_lec_rating()}')
+
+    def __eq__(self, other):
+        return (self.average_lec_rating() == other.average_lec_rating())
+
+    def __gt__(self, other):
+        return (self.average_lec_rating() > other.average_lec_rating())
 
 
 class Reviewer(Mentor):
 
     def rate_hw(self, student, course, grade):
+        """Реализует выставление оценки студенту за домашнее задание
+           по курсу."""
+
         if (isinstance(student, Student)
             and course in self.courses_attached
                 and course in student.courses_in_progress):
@@ -111,6 +152,16 @@ class Reviewer(Mentor):
 
 
 def compare_lecturers(lecturers):
+    """Реализует формирование и вывод на печать рейтинга лекторов на основании
+
+       На вход метод получает список лекторов.
+       Формирует словарь Лектор - средняя оценка.
+       Формирует отсортированный по возрастанию список средних оценок.
+       Формирует новый словарь Лектор - средняя оценка отсортированный
+       по возрастанию средней оценки.
+       Выводит полученный словарь на печать в обратном порядке (по уменьшению
+       средней оценки лекторов."""
+
     unsorted_lecturers = {}
     sorted_lecturers = {}
     for lecturer in lecturers:
@@ -130,6 +181,16 @@ def compare_lecturers(lecturers):
 
 
 def compare_students(students):
+    """Реализует формирование и вывод на печать рейтинга лекторов на основании
+
+       На вход метод получает список студентов.
+       Формирует словарь Студент - средняя оценка.
+       Формирует отсортированный по возрастанию список средних оценок.
+       Формирует новый словарь Студент - средняя оценка, отсортированный
+       по возрастанию средней оценки.
+       Выводит полученный словарь на печать в обратном порядке (по уменьшению
+       средней оценки студентов."""
+
     unsorted_students = {}
     sorted_students = {}
     for student in students:
@@ -149,6 +210,11 @@ def compare_students(students):
 
 
 def average_hw_grade_for_all_students(students, course_1):
+    """Реализует подсчет средней оценки за домашние задания по всем студентам
+       в рамках конкретного курса.
+
+       На вход метод получает список экземпляров класса Студент и курс."""
+
     grades_quantity = 0
     grades_sum = 0
     for student in students:
@@ -165,6 +231,11 @@ def average_hw_grade_for_all_students(students, course_1):
 
 
 def average_grade_for_all_lecturers(lecturers, course_1):
+    """Реализует подсчет средней оценки за лекции по всем лекторам
+       в рамках конкретного курса.
+
+       На вход метод получает список экземпляров класса Лектор и курс."""
+
     grades_quantity = 0
     grades_sum = 0
     for lecturer in lecturers:
@@ -207,12 +278,12 @@ cool_reviewer.rate_hw(first_student, 'Python', 9)
 cool_reviewer.rate_hw(first_student, 'Python', 10)
 
 hot_reviewer.rate_hw(first_student, 'Git', 8)
-hot_reviewer.rate_hw(first_student, 'Git', 9)
+hot_reviewer.rate_hw(first_student, 'Git', 10)
 hot_reviewer.rate_hw(first_student, 'Git', 9)
 
 hot_reviewer.rate_hw(second_student, 'Python', 8)
 hot_reviewer.rate_hw(second_student, 'Python', 9)
-hot_reviewer.rate_hw(second_student, 'Python', 8)
+hot_reviewer.rate_hw(second_student, 'Python', 10)
 
 cool_reviewer.rate_hw(second_student, 'Git', 8)
 cool_reviewer.rate_hw(second_student, 'Git', 10)
@@ -224,7 +295,7 @@ first_student.rate_lecturer(cool_lecturer, 'Python', 10)
 first_student.rate_lecturer(cool_lecturer, 'Python', 10)
 
 second_student.rate_lecturer(hot_lecturer, 'Git', 8)
-second_student.rate_lecturer(hot_lecturer, 'Git', 9)
+second_student.rate_lecturer(hot_lecturer, 'Git', 10)
 second_student.rate_lecturer(hot_lecturer, 'Python', 10)
 
 # Проверяем работу метода __str__ у всех классов
@@ -245,35 +316,38 @@ print()
 print(second_student)
 print()
 
-# Сравниваем лекторов по средней оценке за лекции
-# (строим рейтинг по убыванию средней)
+# Сравниваем лекторов по средней оценке за лекции:
+# строим рейтинг по убыванию средней (опционально, нет в задании)
 lecturers = [cool_lecturer, hot_lecturer]
 compare_lecturers(lecturers)
 
 # Сравниваем лекторов через оператор сравнения, как требуется в п.2 Задания №3
-if cool_lecturer.average_lec_rating() > hot_lecturer.average_lec_rating():
+# с использованием магических методов __gt__ и __eq__
+if cool_lecturer > hot_lecturer:
     print(f'{cool_lecturer.name} {cool_lecturer.surname}'
           f' - лидирует в рейтинге!')
-elif hot_lecturer.average_lec_rating() == cool_lecturer.average_lec_rating():
+elif cool_lecturer == hot_lecturer:
     print('Наши лекторы не уступают друг другу!')
 else:
     print(f'{hot_lecturer.name} {hot_lecturer.surname} - лидирует в рейтинге!')
 print()
 
 # Сравниваем студентов по средней оценке за ДЗ
-# (строим рейтинг по убыванию средней)
+# строим рейтинг по убыванию средней (опционально, нет в задании)
 students = [first_student, second_student]
 compare_students(students)
 
 # Сравниваем студентов через оператор сравнения, согласно п.2 Задания №3
-if first_student.average_hw_grade() > second_student.average_hw_grade():
+# с использованием магических методов __gt__ и __eq__
+if first_student > second_student:
     print(f'{first_student.name} {first_student.surname}'
           f' - лидирует в рейтинге!')
-elif first_student.average_hw_grade() == second_student.average_hw_grade():
+elif first_student == second_student:
     print('Наши студенты не уступают друг другу!')
 else:
     print(f'{second_student.name} {second_student.surname}'
           f' - лидирует в рейтинге!')
+print()
 
 # Расчет средней оценки студентов за ДЗ и лекторов в рамках конкретного курса
 # (п. 1-2 Задания №4):
@@ -285,11 +359,11 @@ if result_for_students is not None:
     print(f'Средняя оценка студентов за ДЗ в рамках курса {course}:')
     print(result_for_students)
 else:
-    print('Ошибка. У студентов нет такого курса в плане.')
+    print('Ошибка. У студентов нет такого курса в плане!')
 
 result_for_lecturers = average_grade_for_all_lecturers(lecturers, course)
 if result_for_lecturers is not None:
-    print(f'Средняя оценка лекторов в рамках курса {course}:')
+    print(f'Средняя оценка лекторов за лекции в рамках курса {course}:')
     print(result_for_lecturers)
 else:
-    print('Ошибка. У лекторов нет такого курса в плане.')
+    print('Ошибка. У лекторов нет такого курса в плане!')
